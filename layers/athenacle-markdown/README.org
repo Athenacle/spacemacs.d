@@ -1,0 +1,171 @@
+#+TITLE: Athenacle-Markdown Layer
+
+[[https://raw.githubusercontent.com/syl20bnr/spacemacs/master/layers/%2Blang/markdown/img/markdown.png]]
+
+* Table of Contents                                         :TOC_4_gh:noexport:
+- [[#description][Description]]
+  - [[#features][Features]]
+- [[#install][Install]]
+- [[#configuration][Configuration]]
+  - [[#browser-configuration][Browser Configuration]]
+- [[#usage][Usage]]
+  - [[#generate-a-toc][Generate a TOC]]
+- [[#key-bindings][Key bindings]]
+  - [[#element-insertion][Element insertion]]
+  - [[#element-removal][Element removal]]
+  - [[#completion][Completion]]
+  - [[#following-and-jumping][Following and Jumping]]
+  - [[#indentation][Indentation]]
+  - [[#header-navigation][Header navigation]]
+  - [[#buffer-wide-commands][Buffer-wide commands]]
+  - [[#list-editing][List editing]]
+  - [[#movement][Movement]]
+  - [[#promotion-demotion][Promotion, Demotion]]
+- [[#change-log][Change Log]]
+- [[#todos][TODOs]]
+
+* Description
+This layer adds markdown support to Spacemacs.
+This layer mainly from spacemacs official [[markdown layer][https://github.com/syl20bnr/spacemacs/tree/master/layers/%2Blang/markdown]]
+** Features
+- markdown files support via [[http://jblevins.org/git/markdown-mode.git/][markdown-mode]]
+- TOC generation via [[https://github.com/ardumont/markdown-toc][markdown-toc]]
+- Live Markdown Preview via [[flymd][https://github.com/mola-T/flymd]]
+
+* Install
+  To use this layer, you will need to add =athenacle-markdown= to your  existing =dotspacemacs-configuration-layers= list in file =~/.spacemacs=
+
+#+BEGIN_SRC  emacs-lisp
+ (setq dotspacemacs-configuration-layers
+   '((athenacle-markdown :variables
+                      athenacle-markdown/preview-browser "google-chrome")))
+#+END_SRC
+*NOTE*: Markdown file extension is auto assignment to Spacemacs =markdown= layer in file [[auto-layer.el][https://github.com/syl20bnr/spacemacs/blob/master/layers/auto-layer.el]]
+through the =lazy-installation= mechanic. The configuration =dotspacemacs-enable-lazy-installation= could be set to =nil= to avoid being asked with "Markdown Mode is Supported......"
+  
+* Configuration
+** Browser Configuration
+The variable =athenacle-markdown/preview-browser= indicate the browser executable which will
+works as the Live Markdown Preview Browser. Its default value is =google-chrome=. If it is not set correctly,
+flymd will refuse to start. The browser executable must exist in your =PATH= environment variables.
+*NOTE:* When work with Google Chrome, flymd may meet some compatibility issues. Please refer [[Browser Compatibility][Browser Compatibility]].
+
+* Usage
+** Generate a TOC
+To generate a table of contents type on top of the buffer:
+~SPC SPC markdown-toc-generate-toc RET~
+
+* Key bindings
+** Element insertion
+
+| Key Binding | Description                                                       |
+|-------------+-------------------------------------------------------------------|
+| ~SPC m -~   | insert horizontal line                                            |
+| ~SPC m h i~ | insert header dwim                                                |
+| ~SPC m h I~ | insert header setext dwim                                         |
+| ~SPC m h 1~ | insert header atx 1                                               |
+| ~SPC m h 2~ | insert header atx 2                                               |
+| ~SPC m h 3~ | insert header atx 3                                               |
+| ~SPC m h 4~ | insert header atx 4                                               |
+| ~SPC m h 5~ | insert header atx 5                                               |
+| ~SPC m h 6~ | insert header atx 6                                               |
+| ~SPC m h !~ | insert header setext 1                                            |
+| ~SPC m h @~ | insert header setext 2                                            |
+| ~SPC m i l~ | insert link                                                       |
+| ~SPC m i L~ | insert reference link dwim                                        |
+| ~SPC m i u~ | insert uri                                                        |
+| ~SPC m i f~ | insert footnote                                                   |
+| ~SPC m i w~ | insert wiki link                                                  |
+| ~SPC m i i~ | insert image                                                      |
+| ~SPC m i I~ | insert reference image                                            |
+| ~SPC m i t~ | insert Table of Contents (toc)                                    |
+| ~SPC m x b~ | make region bold or insert bold                                   |
+| ~SPC m x i~ | make region italic or insert italic                               |
+| ~SPC m x c~ | make region code or insert code                                   |
+| ~SPC m x C~ | make region code or insert code (Github Flavored Markdown format) |
+| ~SPC m x q~ | make region blockquote or insert blockquote                       |
+| ~SPC m x Q~ | blockquote region                                                 |
+| ~SPC m x p~ | make region or insert pre                                         |
+| ~SPC m x P~ | pre region                                                        |
+
+** Element removal
+
+| Key Binding | Description         |
+|-------------+---------------------|
+| ~SPC m k~   | kill thing at point |
+
+** Completion
+
+| Key Binding | Description |
+|-------------+-------------|
+| ~SPC m ]~   | complete    |
+
+** Following and Jumping
+
+| Key Binding | Description           |
+|-------------+-----------------------|
+| ~SPC m o~   | follow thing at point |
+| ~SPC m j~   | jump                  |
+
+** Indentation
+
+| Key Binding | Description   |
+|-------------+---------------|
+| ~SPC m \>~  | indent region |
+| ~SPC m \<~  | exdent region |
+
+** Header navigation
+
+| Key Binding | Description                  |
+|-------------+------------------------------|
+| ~gj~        | outline forward same level   |
+| ~gk~        | outline backward same level  |
+| ~gh~        | outline up one level         |
+| ~gl~        | outline next visible heading |
+
+** Buffer-wide commands
+
+| Key Binding | Description              |
+|-------------+--------------------------|
+| ~SPC m c ]~ | complete buffer          |
+| ~SPC m c m~ | other window             |
+| ~SPC m c p~ | preview                  |
+| ~SPC m c P~ | live preview using flymd |
+| ~SPC m c e~ | export                   |
+| ~SPC m c v~ | export and preview       |
+| ~SPC m c o~ | open                     |
+| ~SPC m c w~ | kill ring save           |
+| ~SPC m c c~ | check refs               |
+| ~SPC m c n~ | cleanup list numbers     |
+| ~SPC m c r~ | render buffer            |
+
+** List editing
+
+| Key Binding | Description      |
+|-------------+------------------|
+| ~SPC m l i~ | insert list item |
+
+** Movement
+
+| Key Binding | Description        |
+|-------------+--------------------|
+| ~SPC m {~   | backward paragraph |
+| ~SPC m }~   | forward paragraph  |
+| ~SPC m N~   | next link          |
+| ~SPC m P~   | previous link      |
+
+** Promotion, Demotion
+
+| Key Binding | Description        |
+|-------------+--------------------|
+| ~M-k~       | markdown-move-up   |
+| ~M-j~       | markdown-move-down |
+| ~M-h~       | markdown-promote   |
+| ~M-l~       | markdown-demote    |
+
+
+* Change Log
+- =<2018-01-05 Fri>= Initial Commit.
+
+* TODOs
+- Enable Some other Browser  Support.
