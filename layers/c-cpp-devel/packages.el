@@ -49,13 +49,6 @@
        (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
        (spacemacs|diminish irony-mode " Ⓘ" " I"))))
 
-(defun c-cpp-devel/init-ggtags()
-  (use-package ggtags
-    :defer t
-    :init
-    (progn
-      (spacemacs|diminish ggtags-mode " Ⓖ" " G"))))
-
 (defun c-cpp-devel/init-company-irony()
   (use-package company-irony
      :defer t
@@ -119,7 +112,6 @@
     :mode (("CMakeLists\\.txt\\'" . cmake-mode) ("\\.cmake\\'" . cmake-mode))
     :init (push 'company-cmake company-backends-cmake-mode)))
 
-
 (defun c-cpp-devel/post-init-company ()
   (spacemacs|add-company-hook c-mode-common)
   (spacemacs|add-company-hook cmake-mode)
@@ -144,7 +136,8 @@
 
 (defun c-cpp-devel/post-init-ggtags ()
   (add-hook 'c-mode-local-vars-hook #'spacemacs/ggtags-mode-enable)
-  (add-hook 'c++-mode-local-vars-hook #'spacemacs/ggtags-mode-enable))
+  (add-hook 'c++-mode-local-vars-hook #'spacemacs/ggtags-mode-enable)
+  (spacemacs|diminish ggtags-mode " Ⓖ" " G"))
 
 (defun c-cpp-devel/init-gdb-mi ()
   (use-package gdb-mi

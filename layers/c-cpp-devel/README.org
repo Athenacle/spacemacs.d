@@ -1,5 +1,5 @@
 #+TITLE: C/C++ layer
-
+[[http://spacemacs.org][file:https://cdn.rawgit.com/syl20bnr/spacemacs/442d025779da2f62fc86c2082703697714db6514/assets/spacemacs-badge.svg]]
 [[file:img/ccpp.jpg]]
 [[file:img/cmake.png]]
 
@@ -14,6 +14,7 @@
     - [[#clang-format][clang-format]]
     - [[#company-clang-and-flycheck][Company-clang and flycheck]]
 - [[#key-bindings][Key Bindings]]
+- [[#change-log][Change Log]]
 
 * Description
 This layer adds configuration for C/C++ language as well support for [[http://www.cmake.org/][CMake]]
@@ -112,3 +113,8 @@ doesn't complain about missing header files.
 | ~SPC m r~   | srefactor: refactor thing at point.                                    |
 
 *Note:*  [[https://github.com/tuhdo/semantic-refactor][semantic-refactor]]  is only available for Emacs 24.4+
+
+* Change Log
+- =2018-01-05= Remove =c-cpp-devel/init-gtags=. This function have been owned by layer gtags.
+  Move =(spacemacs|diminish ggtags-mode " Ⓖ" " G")= to =c-cpp-devel/post-init-ggtags=
+  Otherwise, an warning will occur during spacemacs startup procedure.
