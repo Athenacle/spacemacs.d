@@ -48,8 +48,9 @@
       (setq flymd-browser-open-function 'athenacle-markdown/start))))
 
 (defun athenacle-markdown/post-init-company ()
-  (spacemacs|add-company-hook 'markdown-mode)
-  (push 'company-capf company-backends-markdown-mode))
+  ;;(spacemacs|add-company-hook 'markdown-mode)
+  ;;(push 'company-capf company-backends-markdown-mode))
+  )
 
 (defun athenacle-markdown/init-gh-md ()
   (use-package gh-md

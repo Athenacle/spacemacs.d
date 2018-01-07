@@ -1,5 +1,5 @@
 
-(spacemacs|defvar-company-backends markdown-mode)
+;;(spacemacs|defvar-company-backends markdown-mode)
 
 (defvar athenacle-markdown/preview-browser "google-chrome"
   "Markdown Page Live Preview Browser"
