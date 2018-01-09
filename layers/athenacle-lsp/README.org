@@ -1,4 +1,5 @@
 #+TITLE: athenacle-lsp layer
+
 [[http://spacemacs.org][file:https://cdn.rawgit.com/syl20bnr/spacemacs/442d025779da2f62fc86c2082703697714db6514/assets/spacemacs-badge.svg]]
 
 # TOC links should be GitHub style anchors.
@@ -11,54 +12,58 @@
 - [[#known-issues][Known Issues]]
 
 * Description
-  This layer support for C-C++-ObjectC/Python [[https://langserver.org][Language Server Protocol]] Support.
+  This layer support for C-C++-ObjectC/Python/Java [[https://langserver.org][Language Server Protocol]] Support.
 ** Features:
-  - Add LSP Support via [[https://github.com/emacs-lsp/lsp-mode][=lsp-mode=]]
-  - Add LSP UI via [[https://github.com/emacs-lsp/lsp-ui][=lsp-ui=]] and add Flycheck Backend =lsp-flycheck=
-  - Add [[https://github.com/tigersoldier/company-lsp][=company-lsp=]] backend for [[https://github.com/company-mode/company-mode][=company=]]
-  - Add C/C++/ObjectC Language Emacs Client [[https://github.com/jacobdufault/cquery/emacs/cquery.el][=cquery.el=]] and its server is [[https://github.com/jacobdufault/cquery][cquery]] 
-  - Add Python Language Emacs Client [[https://github.com/emacs-lsp/lsp-python][=lsp-python=]] and its server is [[https://github.com/palantir/python-language-server][Python-Language-Server]] 
+   - Add LSP Support via [[https://github.com/emacs-lsp/lsp-mode][lsp-mode]]
+   - Add LSP UI via [[https://github.com/emacs-lsp/lsp-ui][lsp-ui]] and add Flycheck Backend =lsp-flycheck=
+   - Add [[https://github.com/tigersoldier/company-lsp][company-lsp]] backend for [[https://github.com/company-mode/company-mode][company]]
+   - Add C/C++/ObjectC Language Emacs Client [[https://github.com/jacobdufault/cquery/blob/master/emacs/cquery.el][cquery.el]] when official =c-c++= layer is enabled, and its server is [[https://github.com/jacobdufault/cquery][cquery]].  
+   - Add Python Language Emacs Client [[https://github.com/emacs-lsp/lsp-python][lsp-python]] when =python= layer is enabled, and its server is [[https://github.com/palantir/python-language-server][Python-Language-Server]] 
+   - Add Java Language Client [[https://github.com/emacs-lsp/lsp-java][lsp-java]]  when =java= layer is enabled, and it server is [[https://projects.eclipse.org/projects/eclipse.jdt.ls][Eclipse JDT Language Server]]
 
 * Install
-*This Is the Emacs Part of LSP. You must install the servers =cquery= or =Python-Language-Server= by hand. Please refer their homepages for more infomation.*
+  *This Is the Emacs Part of LSP. You must install the servers =cquery= or =Python-Language-Server= by hand. Please refer their homepages for more infomation.*
 
-To use this configuration layer, add it to your =~/.spacemacs=. You will need to add =athenacle-lsp= to the existing =dotspacemacs-configuration-layers= list in this
-file.
-#+BEGIN_SRC elisp
-  (setq dotspacemacs-configuration-layers 
-        '((athenacle-lsp :variables 
-                         athenacle-lsp/cquery-path "/path/to/cquery"
-                         athenacle-lsp/pyls-path "/path/to/pyls")))
-#+END_SRC
+  To use this configuration layer, add it to your =~/.spacemacs=. You will need to add =athenacle-lsp= to the existing =dotspacemacs-configuration-layers= list in this
+  file.
+  #+BEGIN_SRC elisp
+    (setq dotspacemacs-configuration-layers 
+          '((athenacle-lsp :variables 
+                           athenacle-lsp/cquery-path "/path/to/cquery"
+                           athenacle-lsp/pyls-path "/path/to/pyls"
+                           athenacle-lsp/jdt-path "/path/to/jdt")))
+  #+END_SRC
 
-If variable =athenacle-lsp/cquery-path= is not set, its default value is =cquery=, which should exist in your PATH directoies.
-If variable =athenacle-lsp/pyls-path= is not set, its default value is =pyls=, which should exist in your PATH directoies.
+  - If variable =athenacle-lsp/cquery-path= is not set, its default value is =cquery=, which should exist in your PATH directoies.
+  - If variable =athenacle-lsp/pyls-path= is not set, its default value is =pyls=, which should exist in your PATH directoies.
+  - If variable =athenacle-lsp/jdt-path= is not set, its defualt value is =~/.emacs.d/eclipse.jdt.ls/server/=
+  *Note:* lsp-java search Java Language Server =plugins/org.eclipse.equinox.launcher_xxxx.jar= from =athenacle-lsp/jdt-path=, which =xxxx= means its version . If this variabl is not set proper, =lsp-java= will refuse to start.
 
 * Key bindings
-Shared Key Bindings
-| Key Binding | Description      |
-| ~SPC m n r~ | Find Reference   |
-| ~SPC m n d~ | Find Definitions |
-| ~SPC m n s~ | Find Symbol      |
+  Shared Key Bindings
+  | Key Binding | Description      |
+  | ~SPC m n r~ | Find Reference   |
+  | ~SPC m n d~ | Find Definitions |
+  | ~SPC m n s~ | Find Symbol      |
 
-Key Bindings in =LSP-UI-PEEK-MODE=
-| Key Binding | Description                   |
-| ~j~         | lsp-ui-peek--select-next      |
-| ~k~         | lsp-ui-peek--select-prev      |
-| ~K~         | lsp-ui-peek--select-prev-file |
-| ~J~         | lsp-ui-peek--select-next-file |
-| ~g~         | lsp-ui-peek--select           |
-| ~c~         | lsp-ui-peek--abort         |
+  Key Bindings in =LSP-UI-PEEK-MODE=
+  | Key Binding | Description                   |
+  | ~j~         | lsp-ui-peek--select-next      |
+  | ~k~         | lsp-ui-peek--select-prev      |
+  | ~K~         | lsp-ui-peek--select-prev-file |
+  | ~J~         | lsp-ui-peek--select-next-file |
+  | ~g~         | lsp-ui-peek--select           |
+  | ~c~         | lsp-ui-peek--abort         |
 
-Key Bindings in =cquery=
-| Key Binding | Description            |
-|-------------+------------------------|
-| ~SPC m q l~ | cquery Codelens Toggle |
+  Key Bindings in =cquery=
+  | Key Binding | Description            |
+  |-------------+------------------------|
+  | ~SPC m q l~ | cquery Codelens Toggle |
 
 * Note
-- The file =cquery.el= doest not exist in MELPA, so I distribute it. It is orignially released under =MIT= License.
-- The file =lsp-python.el= exists in MELPA, but I modified it to change the pyls path. It is originally released under =MIT= License.
+  - The file =cquery.el= does not exist in MELPA, so I redistribute it. It is orignially released under =MIT= License.
+  - The file =lsp-python.el= exists in MELPA, but I modified it to change the pyls path. It is originally released under =MIT= License.
 
 * Known Issues
-- =lsp-ui-peek-mode= may conlicit with =rainbow-delimiters-mode=. If see strange face of delimiters, use ~SPC m n c~ to reset it. This only turn off =rainbow-delimiters-mode= and then turn on it again.
-- When =lsp-python= work together with =helm=, may cause helm have no responsible.
+  - =lsp-ui-peek-mode= may conlicit with =rainbow-delimiters-mode=. If see strange face of delimiters, use ~SPC m n c~ to reset it. This only turn off =rainbow-delimiters-mode= and then turn on it again.
+  - When =lsp-python= work together with =helm=, may cause helm have no responsible.
