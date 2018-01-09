@@ -2,10 +2,19 @@
 ;; This file is loaded by Spacemacs at startup.
 ;; It must be stored in your home directory.
 
+;;; functions begin
+
+(defconst athenacle/spacemacs-prefix (expand-file-name "../.spacemacs.d/" user-emacs-directory))
+(defconst athenacle/load-path (expand-file-name (concat athenacle/spacemacs-prefix "/lisp/")))
+(defconst athenacle/custom-file (expand-file-name (concat  athenacle/spacemacs-prefix "/custom.el")))
+
+
+;; functions end
+
 (defun dotspacemacs/layers ()
   "Configuration Layers declaration.
-You should not put any user code in this function besides modifying the variable
-values."
+  You should not put any user code in this function besides modifying the variable
+  values."
   (setq-default
    ;; Base distribution to use. This is a layer contained in the directory
    ;; `+distribution'. For now available distributions are `spacemacs-base'
@@ -20,10 +29,10 @@ values."
    ;; installation feature and you have to explicitly list a layer in the
    ;; variable `dotspacemacs-configuration-layers' to install it.
    ;; (default 'unused)
-   dotspacemacs-enable-lazy-installation 'unused
+   dotspacemacs-enable-lazy-installation 'nil
    ;; If non-nil then Spacemacs will ask for confirmation before installing
    ;; a layer lazily. (default t)
-   dotspacemacs-ask-for-lazy-installation t
+   dotspacemacs-ask-for-lazy-installation nil
    ;; If non-nil layers with lazy install support are lazy installed.
    ;; List of additional paths where to look for configuration layers.
    ;; Paths must have a trailing slash (i.e. `~/.mycontribs/')
@@ -38,11 +47,15 @@ values."
      ;; ----------------------------------------------------------------
      helm
      auto-completion
-     ;; better-defaults
      emacs-lisp
      git
-     (markdown :variables
-               markdown-live-preview-engine 'vmd)
+     lua
+     rcirc
+     gtags
+     (chinese :variables
+              chinese-enable-fcitx t)
+     (elfeed :variables
+             rmh-elfeed-org-files (list "~/.spacemacs.d/files/elfeed.org"))
      org
      (shell :variables
             shell-default-height 30
@@ -52,13 +65,24 @@ values."
                      ispell-dictionary "american"
                      spell-checking-enable-by-default nil)
      syntax-checking
+     emoji
      shell-scripts
-     gtags
      python
-     (c-cpp-devel :variables
-                  c-cpp-devel-default-mode-for-headers 'c++-mode
-                  c-cpp-devel-enable-clang-support t)
-     ;; version-control
+     java
+     javascript
+     (c-c++ :variables
+            c-c++-enable-clang-support t
+            ;; c-c++-enable-cmake-ide-support t
+            c-c++-enable-clang-format-on-save t
+            c-c++-enable-c++11 t
+            c-c++-default-mode-for-headers 'c++-mode)
+     (athenacle-markdown :variables
+                         athenacle-markdown/preview-browser "google-chrome-stable")
+     (athenacle-lsp :variables
+                    athenacle-lsp/cquery-path "~/.local/bin/cquery"
+                    ;;athenacle-lsp/cquery-addition-arguments '("--log-stdin-stdout-to-stderr" "--log /tmp/cquery.log")
+                    athenacle-lsp/pyls-path "~/.local/bin/pyls"
+                    athenacle-lsp/jdt-path "~/gits/eclipse.jdt.ls/org.eclipse.jdt.ls.product/target/repository")
      )
    ;; List of additional packages that will be installed without being
    ;; wrapped in a layer. If you need some configuration for these
@@ -68,7 +92,28 @@ values."
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
    ;; A list of packages that will not be installed and loaded.
-   dotspacemacs-excluded-packages '()
+   dotspacemacs-excluded-packages '(;;; for c cpp
+                          gdb-mi
+                          counsel-gtags
+                          ;;; for python
+                          anaconda-mode
+                          ;;; for java
+                          gradle-mode
+                          counsel-gtags
+                          maven-test-mode
+                          company-emacs-eclim
+                          meghanada ;; A Java IDE Server for your editor
+                          mvn
+                          ensime ;; ENhanced Scala Interaction Mode for Emacs
+                          flycheck-ensime
+                          ;;; for javascript
+                          tern
+                          company-tern
+                          impatient-mode
+                          coffee-mode
+                          add-node-modules-path
+                          evil-matchit
+                          )
    ;; Defines the behaviour of Spacemacs when installing packages.
    ;; Possible values are `used-only', `used-but-keep-unused' and `all'.
    ;; `used-only' installs only explicitly used packages and uninstall any
@@ -80,10 +125,10 @@ values."
 
 (defun dotspacemacs/init ()
   "Initialization function.
-This function is called at the very startup of Spacemacs initialization
-before layers configuration.
-You should not put any user code in there besides modifying the variable
-values."
+  This function is called at the very startup of Spacemacs initialization
+  before layers configuration.
+  You should not put any user code in there besides modifying the variable
+  values."
   ;; This setq-default sexp is an exhaustive list of all the supported
   ;; spacemacs settings.
   (setq-default
@@ -93,7 +138,7 @@ values."
    ;; This variable has no effect if Emacs is launched with the parameter
    ;; `--insecure' which forces the value of this variable to nil.
    ;; (default t)
-   dotspacemacs-elpa-https t
+   dotspacemacs-elpa-https nil
    ;; Maximum allowed time in seconds to contact an ELPA repository.
    dotspacemacs-elpa-timeout 5
    ;; If non nil then spacemacs will check for updates at startup
@@ -113,7 +158,7 @@ values."
    ;; (default 'vim)
    dotspacemacs-editing-style 'vim
    ;; If non nil output loading progress in `*Messages*' buffer. (default nil)
-   dotspacemacs-verbose-loading nil
+   dotspacemacs-verbose-loading t
    ;; Specify the startup banner. Default value is `official', it displays
    ;; the official spacemacs logo. An integer value is the index of text
    ;; banner, `random' chooses a random text banner in `core/banners'
@@ -127,8 +172,10 @@ values."
    ;; `recents' `bookmarks' `projects' `agenda' `todos'."
    ;; List sizes may be nil, in which case
    ;; `spacemacs-buffer-startup-lists-length' takes effect.
-   dotspacemacs-startup-lists '((recents . 9)
-                                (projects . 5))
+   dotspacemacs-startup-lists '((recents . 6)
+                      (agenda . 5)
+                      (todos  . 5)
+                      (projects . 5))
    ;; True if the home buffer should respond to resize events.
    dotspacemacs-startup-buffer-responsive t
    ;; Default major mode of the scratch buffer (default `text-mode')
@@ -137,16 +184,16 @@ values."
    ;; Press <SPC> T n to cycle to the next theme in the list (works great
    ;; with 2 themes variants, one dark and one light)
    dotspacemacs-themes '(spacemacs-light
-                         spacemacs-dark)
+               spacemacs-dark)
    ;; If non nil the cursor color matches the state color in GUI Emacs.
    dotspacemacs-colorize-cursor-according-to-state t
    ;; Default font, or prioritized list of fonts. `powerline-scale' allows to
    ;; quickly tweak the mode-line size to make separators look not too crappy.
-   dotspacemacs-default-font '("Source Code Pro"
-                               :size 15
-                               :weight normal
-                               :width normal
-                               :powerline-scale 1.1)
+   dotspacemacs-default-font '("Source Code Pro for Powerline"
+                     :size 15
+                     :weight normal
+                     :width normal
+                     :powerline-scale 1.1)
    ;; The leader key
    dotspacemacs-leader-key "SPC"
    ;; The key used for Emacs commands (M-x) (after pressing on the leader key).
@@ -218,7 +265,7 @@ values."
    dotspacemacs-enable-paste-transient-state nil
    ;; Which-key delay in seconds. The which-key buffer is the popup listing
    ;; the commands bound to the current keystroke sequence. (default 0.4)
-   dotspacemacs-which-key-delay 0.4
+   dotspacemacs-which-key-delay 0.2
    ;; Which-key frame position. Possible values are `right', `bottom' and
    ;; `right-then-bottom'. right-then-bottom tries to display the frame to the
    ;; right; if there is insufficient space it displays it at the bottom.
@@ -230,7 +277,7 @@ values."
    dotspacemacs-loading-progress-bar t
    ;; If non nil the frame is fullscreen when Emacs starts up. (default nil)
    ;; (Emacs 24.4+ only)
-   dotspacemacs-fullscreen-at-startup t
+   dotspacemacs-fullscreen-at-startup nil
    ;; If non nil `spacemacs/toggle-fullscreen' will not use native fullscreen.
    ;; Use to disable fullscreen animations in OSX. (default nil)
    dotspacemacs-fullscreen-use-non-native nil
@@ -305,39 +352,27 @@ values."
 
 (defun dotspacemacs/user-init ()
   "Initialization function for user code.
-It is called immediately after `dotspacemacs/init', before layer configuration
-executes.
- This function is mostly useful for variables that need to be set
-before packages are loaded. If you are unsure, you should try in setting them in
-`dotspacemacs/user-config' first."
-  ;; (setq configuration-layer--elpa-archives
-  ;;       '(("melpa-cn" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")
-  ;;         ("org-cn"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/org/")
-  ;;         ("gnu-cn"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")))
-  )
+  It is called immediately after `dotspacemacs/init', before layer configuration
+  executes.
+  This function is mostly useful for variables that need to be set
+  before packages are loaded. If you are unsure, you should try in setting them in
+  `dotspacemacs/user-config' first."
+  (setq custom-file athenacle/custom-file)
+  (load athenacle/custom-file)
+  (add-to-load-path athenacle/load-path))
 
 (defun dotspacemacs/user-config ()
   "Configuration function for user code.
-This function is called at the very end of Spacemacs initialization after
-layers configuration.
-This is the place where most of your configurations should be done. Unless it is
-explicitly specified that a variable should be set before a package is loaded,
-you should place your code here."
+  This function is called at the very end of Spacemacs initialization after
+  layers configuration.
+  This is the place where most of your configurations should be done. Unless it is
+  explicitly specified that a variable should be set before a package is loaded,
+  you should place your code here."
+  (require 'init-lsp)
+  (require 'init-keybindings)
+  (require 'init-others)
+  (require 'init-style)
+  (athenacle|init-style)
+  (athenacle|add-hooks)
+  (setq browse-url-browser-function 'browse-url-chrome)
   )
-
-;; Do not write anything past this comment. This is where Emacs will
-;; auto-generate custom variable definitions.
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(package-selected-packages
-   (quote
-    (vmd-mode yapfify xterm-color ws-butler winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline smeargle shell-pop restart-emacs rainbow-delimiters pyvenv pytest pyenv-mode py-isort popwin pip-requirements persp-mode pcre2el paradox orgit org-projectile org-present org-pomodoro org-download org-bullets open-junk-file neotree multi-term move-text mmm-mode markdown-toc magit-gitflow macrostep lorem-ipsum live-py-mode linum-relative link-hint insert-shebang info+ indent-guide hy-mode hungry-delete htmlize hl-todo highlight-parentheses highlight-numbers highlight-indentation hide-comnt help-fns+ helm-themes helm-swoop helm-pydoc helm-projectile helm-mode-manager helm-make helm-gtags helm-gitignore helm-flx helm-descbinds helm-company helm-c-yasnippet helm-ag google-translate golden-ratio gnuplot gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link gh-md ggtags fuzzy flyspell-correct-helm flycheck-pos-tip flycheck-irony flx-ido fish-mode fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-magit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu eshell-z eshell-prompt-extras esh-help elisp-slime-nav dumb-jump disaster diminish define-word cython-mode company-statistics company-shell company-irony company-c-headers company-anaconda column-enforce-mode cmake-mode clean-aindent-mode clang-format auto-yasnippet auto-highlight-symbol auto-dictionary auto-compile aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line ac-ispell))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )

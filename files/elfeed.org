@@ -1,0 +1,20 @@
+* Blogs                                                              :elfeed:
+** Development                                                 :dev:
+*** Emacs                                                    :emacs:
+**** http://planet.emacsen.org/atom.xml
+*** Gentoo  :linux:
+**** https://planet.gentoo.org/rss20.xml
+**** https://security.gentoo.org/glsa/feed.rss
+*** Linux                                                         :linux:
+**** https://linux.cn/rss.xml
+**** http://feeds.feedburner.com/linuxjournalcom
+**** https://www.linux.com/feeds/blogs/community/rss
+**** https://www.linux.com/feeds/news/desktop/rss
+**** https://www.linux.com/feeds/news/rss
+*** Others
+**** https://maskray.me/blog/atom.xml
+**** https://coolshell.cn/feed
+** Lifestyle  :others:
+*** Science
+**** http://songshuhui.net/feed
+**** http://www.solidot.org/index.rss
