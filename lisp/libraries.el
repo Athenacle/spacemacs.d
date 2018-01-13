@@ -65,9 +65,10 @@
 
 (defun athenacle|lib-search-from-begin (begin)
   "Begin search from BEGIN."
+  (when begin
   (if (athenacle|lib-file-exist begin athenacle|lib-stop-file)
       begin
-    (athenacle|lib-search-from-begin (athenacle|lib-parent-directory begin) )))
+    (athenacle|lib-search-from-begin (athenacle|lib-parent-directory begin)))))
 
 (defun athenacle|lib-search (begin)
   "Begin search from BEGIN. If found stop file, return its path, otherwise return BEGIN path."
