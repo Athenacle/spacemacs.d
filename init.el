@@ -46,7 +46,15 @@
      ;; <M-m f e R> (Emacs style) to install them.
      ;; ----------------------------------------------------------------
      helm
-     auto-completion
+     (auto-completion :variables
+                      auto-completion-return-key-behavior 'complete
+                      auto-completion-tab-key-behavior 'cycle
+                      auto-completion-complete-with-key-sequence nil
+                      auto-completion-complete-with-key-sequence-delay 0.1
+                      auto-completion-enable-help-tooltip 'manual
+                      auto-completion-enable-sort-by-usage t
+                      auto-completion-idle-delay 0.1
+                      auto-completion-private-snippets-directory nil)
      emacs-lisp
      git
      lua
@@ -70,6 +78,8 @@
      python
      java
      javascript
+     scheme
+     go
      (c-c++ :variables
             c-c++-enable-clang-support t
             ;; c-c++-enable-cmake-ide-support t
@@ -77,27 +87,33 @@
             c-c++-enable-c++11 t
             c-c++-default-mode-for-headers 'c++-mode)
      (athenacle-markdown :variables
-                         athenacle-markdown/preview-browser "google-chrome-stable")
-     (athenacle-lsp :variables
-                    athenacle-lsp/cquery-path "~/.local/bin/cquery"
-                    ;;athenacle-lsp/cquery-addition-arguments '("--log-stdin-stdout-to-stderr" "--log /tmp/cquery.log")
-                    athenacle-lsp/pyls-path "~/.local/bin/pyls"
-                    athenacle-lsp/jdt-path "~/gits/eclipse.jdt.ls/org.eclipse.jdt.ls.product/target/repository")
-     )
+                   athenacle-markdown/preview-browser "google-chrome-stable"))
    ;; List of additional packages that will be installed without being
    ;; wrapped in a layer. If you need some configuration for these
    ;; packages, then consider creating a layer. You can also put the
    ;; configuration in `dotspacemacs/user-config'.
-   dotspacemacs-additional-packages '()
+   dotspacemacs-additional-packages '(all-the-icons
+                            regex-tool
+
+                            lsp-mode
+                            company-lsp
+                            lsp-ui
+                            helm-xref
+                            cquery
+                            lsp-java
+                            )
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
    ;; A list of packages that will not be installed and loaded.
-   dotspacemacs-excluded-packages '(;;; for c cpp
+   dotspacemacs-excluded-packages '(
+                          ;; for c cpp
                           gdb-mi
                           counsel-gtags
-                          ;;; for python
+                          google-c-style
+                          ;; for python
                           anaconda-mode
-                          ;;; for java
+                          hy-mode
+                          ;; for java
                           gradle-mode
                           counsel-gtags
                           maven-test-mode
@@ -106,13 +122,19 @@
                           mvn
                           ensime ;; ENhanced Scala Interaction Mode for Emacs
                           flycheck-ensime
-                          ;;; for javascript
+                          groovy-mode
+                          groovy-imports
+                          ;; for javascript
                           tern
                           company-tern
                           impatient-mode
                           coffee-mode
                           add-node-modules-path
                           evil-matchit
+                          ;;
+                          google-translate
+                          lorem-ipsum ;; Insert dummy pseudo Latin text
+                          edit-server
                           )
    ;; Defines the behaviour of Spacemacs when installing packages.
    ;; Possible values are `used-only', `used-but-keep-unused' and `all'.
@@ -132,6 +154,19 @@
   ;; This setq-default sexp is an exhaustive list of all the supported
   ;; spacemacs settings.
   (setq-default
+   ;; spacemacs initial scratch message.
+   ;; commit 6da15a0c6e30baac9ef23fd8e5ed229b1384f114
+   dotspacemacs-initial-scratch-message ((lambda () (format "Stratch Message @ %s" (current-time-string))))
+
+   ;; Set the theme for the Spaceline. Supported themes are `spacemacs',
+   ;; `all-the-icons', `custom', `vim-powerline' and `vanilla'. The first three
+   ;; are spaceline themes. `vanilla' is default Emacs mode-line. `custom' is a
+   ;; user defined themes, refer to the DOCUMENTATION.org for more info on how
+   ;; to create your own spaceline theme."
+   ;; commit a131c899094738b2628f5441ffcb58da420f7593
+   ;;dotspacemacs-mode-line-theme '(all-the-icons :separator-scale 1.0)
+   dotspacemacs-mode-line-theme 'vim-powerline
+
    ;; If non nil ELPA repositories are contacted via HTTPS whenever it's
    ;; possible. Set it to nil if you have no way to use HTTPS in your
    ;; environment, otherwise it is strongly recommended to let it set to t.
@@ -183,8 +218,8 @@
    ;; List of themes, the first of the list is loaded when spacemacs starts.
    ;; Press <SPC> T n to cycle to the next theme in the list (works great
    ;; with 2 themes variants, one dark and one light)
-   dotspacemacs-themes '(spacemacs-light
-               spacemacs-dark)
+   dotspacemacs-themes '(spacemacs-dark
+               spacemacs-light)
    ;; If non nil the cursor color matches the state color in GUI Emacs.
    dotspacemacs-colorize-cursor-according-to-state t
    ;; Default font, or prioritized list of fonts. `powerline-scale' allows to
@@ -193,7 +228,7 @@
                      :size 15
                      :weight normal
                      :width normal
-                     :powerline-scale 1.1)
+                     :powerline-scale 0.8)
    ;; The leader key
    dotspacemacs-leader-key "SPC"
    ;; The key used for Emacs commands (M-x) (after pressing on the leader key).
@@ -239,7 +274,7 @@
    ;; Size (in MB) above which spacemacs will prompt to open the large file
    ;; literally to avoid performance issues. Opening a file literally means that
    ;; no major mode or minor modes are active. (default is 1)
-   dotspacemacs-large-file-size 1
+   dotspacemacs-large-file-size 5
    ;; Location where to auto-save files. Possible values are `original' to
    ;; auto-save the file in-place, `cache' to auto-save the file to another
    ;; file stored in the cache directory and `nil' to disable auto-saving.
@@ -358,8 +393,7 @@
   before packages are loaded. If you are unsure, you should try in setting them in
   `dotspacemacs/user-config' first."
   (setq custom-file athenacle/custom-file)
-  (load athenacle/custom-file)
-  (add-to-load-path athenacle/load-path))
+  (load athenacle/custom-file))
 
 (defun dotspacemacs/user-config ()
   "Configuration function for user code.
@@ -368,11 +402,11 @@
   This is the place where most of your configurations should be done. Unless it is
   explicitly specified that a variable should be set before a package is loaded,
   you should place your code here."
-  (require 'init-lsp)
-  (require 'init-keybindings)
-  (require 'init-others)
-  (require 'init-style)
-  (athenacle|init-style)
-  (athenacle|add-hooks)
+  (setq powerline-default-separator 'arrow)
   (setq browse-url-browser-function 'browse-url-chrome)
-  )
+  (add-to-load-path athenacle/load-path)
+  (require 'init-packages)
+  (require 'init-others)
+  (require 'init-lsp)
+  (athenacle|setup-packages)
+  (athenacle|setup-others))
