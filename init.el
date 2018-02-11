@@ -79,7 +79,9 @@
      java
      javascript
      scheme
-     go
+     (go :variables
+         go-use-gometalinter t
+         go-tab-width 4 )
      (c-c++ :variables
             c-c++-enable-clang-support t
             ;; c-c++-enable-cmake-ide-support t
@@ -410,3 +412,4 @@
   (require 'init-lsp)
   (athenacle|setup-packages)
   (athenacle|setup-others))
+
