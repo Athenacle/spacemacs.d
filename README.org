@@ -12,6 +12,10 @@
   - [[#lsp][LSP]]
     - [[#athenaclestart-lsp][athenacle|start-lsp]]
     - [[#add-new-lsp-backend][Add New LSP Backend]]
+- [[#misc-files][Misc Files]]
+  - [[#generate-rsync-listel][generate-rsync-list.el]]
+    - [[#description][Description]]
+    - [[#example-bash-code][Example Bash Code]]
 - [[#license][License]]
 - [[#contact][Contact]]
 
@@ -98,6 +102,32 @@
        '("^langserver-go: reading on stdin, writing on stdout$"))
 
       (athenacle|start-lsp go-mode :start go-go-go-go-enable)
+    #+END_SRC
+
+* Misc Files
+** [[generate-sync-list.el][generate-rsync-list.el]]
+*** Description
+    Calculate Layers List according to =dotspacemacs-configuration-layers=. It is used for sync layer directory to tmpfs.
+*** Example Bash Code
+    #+BEGIN_SRC sh
+      #!/bin/bash
+
+      emacs_path="$HOME"/.config/.emacs.d
+      emacs_generate_rsync_list_path="$HOME"/.spacemacs.d/generate-rsync-list.el
+      cd "$emacs_path" || exit
+      include_path="$(mktemp)"
+      echo "$emacs_path"
+      emacs -Q --script "$emacs_generate_rsync_list_path" "$emacs_path" "$include_path"
+      cat >> "$include_path" << EOF
+      init.el
+      elpa/
+      core/
+      .cache/
+      private/
+      .lock
+      EOF
+      rsync -ar "$emacs_path" /tmp/emacs --files-from="$include_path" --exclude "*.org"
+      rm "$include_path"
     #+END_SRC
 
 
