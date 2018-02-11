@@ -1,0 +1,46 @@
+#+TITLE: Spacemacs.d
+
+[[http://spacemacs.org][file:https://cdn.rawgit.com/syl20bnr/spacemacs/442d025779da2f62fc86c2082703697714db6514/assets/spacemacs-badge.svg]]
+* Content                                                               :TOC:
+- [[#spacemacs][Spacemacs]]
+- [[#layers][Layers]]
+- [[#configuration][Configuration]]
+  - [[#keys][Keys]]
+    - [[#magit-keys][Magit Keys]]
+    - [[#lsp-keys][LSP Keys]]
+- [[#license][License]]
+- [[#contact][Contact]]
+
+* Spacemacs
+  =Spacemacs= is =A community-driven Emacs distribution=
+
+* Layers
+ - [[layers/athenacle-markdown][athenacle-markdown]] A fork of official [[https://github.com/syl20bnr/spacemacs/blob/master/layers/+lang/markdown/README.org][markdown]] layer. Added some other configurations.
+
+* Configuration 
+
+** Keys
+*** Magit Keys 
+    Prefix: ~SPC gz~
+   | Key         | Description       | Available Mode | Group |
+   |-------------+-------------------+----------------+-------|
+   | ~SPC~ =gzp= | Magit Pull Popup  | All            | Git   |
+   | ~SPC~ =gzf= | Magit Fetch Popup | All            | Git   |
+   | ~SPC~ =gzP= | Magit Push Popup  | All            | Git   |
+
+*** LSP Keys
+    Prefix ~SPC mn~
+    | Key         | Description                | Available Mode                       | Group |
+    |-------------+----------------------------+--------------------------------------+-------|
+    | ~SPC~ =mnd= | LSP Find Definitions       | Go/Javascript/Python/Java/C/C++/ObjC | LSP   |
+    | ~SPC~ =mnr= | LSP File References        | Go/Javascript/Python/Java/C/C++/ObjC | LSP   |
+    | ~SPC~ =mns= | LSP Find Workspace Symbols | Go/Javascript/Python/Java/C/C++/ObjC | LSP   |
+    | ~SPC~ =mnc= | Clear Buffer Delimiters    | Go/Javascript/Python/Java/C/C++/ObjC | LSP   |
+
+
+
+* License
+  [[https://www.gnu.org/licenses/gpl-3.0.en.html][GPLv3]]
+
+* Contact
+  [[mailto:zjjhwxc@gmail.com][zjjhwxc(at)gmail.com]]
