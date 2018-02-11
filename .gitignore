@@ -2,4 +2,5 @@
 *.el~
 lisp/privacy_things.el
 custom.el
+packages/
 
