@@ -1,0 +1,40 @@
+#+TITLE: ebuild layer
+#+AUTHOR: Athenacle
+
+# TOC links should be GitHub style anchors.
+* Table of Contents                                        :TOC_4_gh:noexport:
+- [[#description][Description]]
+  - [[#features][Features:]]
+- [[#install][Install]]
+- [[#key-bindings][Key bindings]]
+- [[#notes][Notes]]
+
+* Description
+  This layer adds support for =ebuild= file. An =ebuild= file is a text file, used by *Gentoo* and related distro to manage package systemd.
+  Please refer [[https://wiki.gentoo.org/wiki/Ebuild][Gentoo Wiki]] for more information.
+** Features:
+  - ebuild-mode
+  - glep-mode
+  - gentoo-newsitem-mode
+
+* Install
+  To use this configuration layer, add it to your =~/.spacemacs=. You will need to
+  add =ebuild= to the existing =dotspacemacs-configuration-layers= list in this
+  file.
+
+* Key bindings
+
+  | Key Binding | Description                            | Mode        |
+  |-------------+----------------------------------------+-------------|
+  | ~SPC m i s~ | ebuild: insert skeleton                | Ebuild-mode |
+  | ~SPC m i a~ | ebuild: insert all available functions | Ebuild-mode |
+  | ~SPC m i f~ | ebuild: insert function                | Ebuild-mode |
+  | ~SPC m x x~ | ebuild: run command                    | Ebuild-mode |
+  | ~SPC m x d~ | ebuild: digest                         | Ebuild-mode |
+  | ~SPC m x f~ | ebuild: fetch                          | Ebuild-mode |
+  | ~SPC m x c~ | ebuild: configure                      | Ebuild-mode |
+  | ~SPC m x b~ | ebuild: compile                        | Ebuild-mode |
+
+* Notes
+  The local package =ebuild-mode=, is from [[ https://wiki.gentoo.org/wiki/Project:Emacs]], which does not exit in MELPA
+  Its License is *GPL2+*.
