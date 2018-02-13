@@ -1,5 +1,4 @@
 #+TITLE: Spacemacs.d
-
 [[http://spacemacs.org][file:https://cdn.rawgit.com/syl20bnr/spacemacs/442d025779da2f62fc86c2082703697714db6514/assets/spacemacs-badge.svg]]
 * Content                                                               :TOC:
 - [[#spacemacs][Spacemacs]]
@@ -9,6 +8,9 @@
     - [[#magit-keys][Magit Keys]]
     - [[#lsp-keys][LSP Keys]]
 - [[#library-references][Library References]]
+  - [[#lisp-function-list][Lisp Function List]]
+  - [[#lisp-macro-list][Lisp Macro List]]
+    - [[#athenaclelib-call-if][=athenacle||lib-call-if=]]
   - [[#lsp][LSP]]
     - [[#athenaclestart-lsp][athenacle|start-lsp]]
     - [[#add-new-lsp-backend][Add New LSP Backend]]
@@ -46,6 +48,43 @@
 
 
 * Library References
+
+** Lisp Function List
+** Lisp Macro List
+*** =athenacle||lib-call-if=
+    - Call =func= when =pred= is not nil, with arguments =object= and =others=
+    - ~(defmacro athenacle||lib-call-if pred func &optional object others)~
+      - pred =function=
+      - func =function=
+      - object =emacs object= /optional/
+      - others =list= /optional/
+    - Sample
+      #+BEGIN_SRC emacs-lisp
+        ;; definition
+        (defmacro athenacle||lib-call-if (pred func &optional object others)
+          "Test function PRED, if it eval as not nil, apply OBJECT to FUNC. When FUNC is nil, set it to `message'."
+          `(when (funcall ,pred)
+             (apply (quote ,func) (cons ,object ,others))))
+
+        (athenacle|start-lsp go-mode :start go-go-go-go-enable)
+      #+END_SRC
+      ;; sample
+      (athenacle||lib-call-if (lambda () t) message "sample %s message" '("usage"))
+
+      ;; expand
+      (macro-expand '(athenacle||lib-call-if (lambda () t) message "sample %s message" '("usage")))
+      ;; ==>
+      ;; (if
+      ;;     (funcall
+      ;;      (lambda nil t))
+      ;;     (progn
+      ;;       (apply 'message
+      ;;               (cons "sample %s message"
+      ;;                     '("usage")))))
+      #+END_SRC
+    - Related Macros
+      - =athenacle||lib-call-if-debug-on-error=
+      - =athenacle||lib-message-if-debug-on-error=
 ** LSP
 *** athenacle|start-lsp
     =athenacle|start-lsp= is a /macro/ defined in [[lisp/init-lsp.el][init-lsp.el]]
@@ -105,7 +144,7 @@
     #+END_SRC
 
 * Misc Files
-** [[generate-sync-list.el][generate-rsync-list.el]]
+** [[generate-rsync-list.el][generate-rsync-list.el]]
 *** Description
     Calculate Layers List according to =dotspacemacs-configuration-layers=. It is used for sync layer directory to tmpfs.
 *** Example Bash Code
@@ -129,7 +168,6 @@
       rsync -ar "$emacs_path" /tmp/emacs --files-from="$include_path" --exclude "*.org"
       rm "$include_path"
     #+END_SRC
-
 
 * License
   [[https://www.gnu.org/licenses/gpl-3.0.en.html][GPLv3]]

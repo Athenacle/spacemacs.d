@@ -66,9 +66,9 @@
 (defun athenacle|lib-search-from-begin (begin)
   "Begin search from BEGIN."
   (when begin
-  (if (athenacle|lib-file-exist begin athenacle|lib-stop-file)
-      begin
-    (athenacle|lib-search-from-begin (athenacle|lib-parent-directory begin)))))
+    (if (athenacle|lib-file-exist begin athenacle|lib-stop-file)
+        begin
+      (athenacle|lib-search-from-begin (athenacle|lib-parent-directory begin)))))
 
 (defun athenacle|lib-search (begin)
   "Begin search from BEGIN. If found stop file, return its path, otherwise return BEGIN path."
@@ -85,6 +85,26 @@
         (athenacle|lib-search (file-name-directory name))
       default-directory)))
 
+
+
+(defmacro athenacle||lib-call-if (pred func &optional object others)
+  "Test function PRED, if it eval as not nil, apply OBJECT to FUNC. When FUNC is nil, set it to `message'."
+     `(when (funcall ,pred)
+       (apply (quote ,func) (cons ,object ,others))))
+
+(defmacro athenacle||lib-call-if-debug-on-error (func &optional object others)
+  "If `debug-on-error' is not nil, apply OBJECT to FUNC."
+    `(athenacle||lib-call-if
+     (lambda () (or init-file-debug debug-on-error))
+     ,func
+     ,object
+     ,others))
+
+(defmacro athenacle||lib-message-if-debug-on-error (object &optional others)
+  "If `debug-on-error' is not nil, print OBJECT by `message'. If OTHERS is not nil, append it to paraments of `message'."
+     `(athenacle||lib-call-if-debug-on-error message ,object ,others))
+
+
 (provide 'libraries)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; libraries.el ends here
