@@ -76,6 +76,7 @@
      (directory-files package-directory))))
 
 (require 'use-package)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; setup packages
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -83,13 +84,21 @@
 ;;; helm-xref package
 (add-to-list 'athenacle|setup-package-lists
              '(helm-xref . (lambda ()
-                             (setq xref-show-xrefs-function 'helm-xref-show-xrefs))))
+                             (use-package helm-xref
+                               :defer t
+                               :config
+                               (setq xref-show-xrefs-function 'helm-xref-show-xrefs)))))
 
 ;;; nameless-mode package
 (add-to-list 'athenacle|setup-package-lists
              '(nameless . (lambda ()
                             (add-to-list 'nameless-global-aliases '("ATH" . "athenacle"))
-                            (add-hook 'emacs-lisp-mode-hook #'nameless-mode))))
+                            (add-hook 'emacs-lisp-mode-hook #'nameless-mode)
+                            (add-hook 'nameless-mode-hook
+                                      (lambda()
+                                        (let ((current-buffer-name (buffer-file-name)))
+                                          (when (and current-buffer-name (string-suffix-p ".el" current-buffer-name))
+                                            (setq-local 'nameless-current-name (file-name-base current-buffer-name)))))))))
 
 
 ;;; neotree package
@@ -117,7 +126,7 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; setup packages end
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 ;;; setup layers begin
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -168,7 +177,7 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; setup layers end
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 ;;; combine them in one
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
