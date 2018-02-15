@@ -17,6 +17,8 @@
 ;;                  Init Version.
 ;;                       Include package: neotree nameless
 ;;                       Include layer: git chinese rcirc elfeed
+;;        2. Feb 16, 2018
+;;                  Refactor with athenacle||lib-macro
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -42,31 +44,14 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (require 'libraries)
+(require 'init-lsp)
 
+
 (defalias 'athenacle|package-used 'configuration-layer/package-used-p)
 (defalias 'athenacle|layer-used 'configuration-layer/layer-used-p)
 
-;;;###autoload
-(defun athenacle|setup-if-enabled (test package-type package func)
-  "Apply PACKAGE argument to the TEST function, call FUNC if TEST return t."
-  (if (funcall test package)
-      (progn
-        (message "Athenacle Setting %s: %s." package-type package)
-        (funcall func))
-    (message "Athenacle %s %s not enabled" package-type package)))
-
-(defun athenacle|setup-if-package-used (package func)
-  "Call FUNC if PACKAGE is enabled."
-  (athenacle|setup-if-enabled #'athenacle|package-used "package" package func))
-
-(defun athenacle|setup-if-layer-used (layer func)
-  "Call FUNC if LAYER is enabled."
-  (athenacle|setup-if-enabled #'athenacle|layer-used "layer" layer func))
-
-(defvar athenacle|setup-layer-lists '())
-(defvar athenacle|setup-package-lists '())
-
 (defun athenacle|add-packages-to-load-path ()
+  "Add directories exist in ~/.spacemacs.d/packages to `load-path'."
   (let ((package-directory (expand-file-name "~/.spacemacs.d/packages")))
     (seq-do
      (lambda(dir)
@@ -75,53 +60,97 @@
            (add-to-list 'load-path full-path))))
      (directory-files package-directory))))
 
+
+(ath-defmacro athenacle||add-package (layer package use-package use-package-config)
+             (when (and layer package)
+               (error "Package %s and layer %s cannot be set together" package layer))
+             (unless (or layer package)
+               (error "Must set one of `layer' or `package'"))
+             (let ((pred (if package 'athenacle|package-used 'athenacle|layer-used))
+                   (pkg (or package layer))
+                   (type (if package "package" "layer")))
+               `(when use-package
+                 (use-package ,use-package
+                   :defer t
+                   :config
+                   (progn ,use-package-config)))
+               (if (funcall pred pkg)
+                   (progn
+                     (athenacle||lib-message-if-debug-on-error
+                      (format "Athenacle: setup %s %s." type pkg))
+                     (funcall body))
+                 (athenacle||lib-message-if-debug-on-error
+                  (format "Athenacle: %s %s not enabled." type pkg)))))
+
+
 (require 'use-package)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; setup packages
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;;; helm-xref package
-(add-to-list 'athenacle|setup-package-lists
-             '(helm-xref . (lambda ()
-                             (use-package helm-xref
-                               :defer t
-                               :config
-                               (setq xref-show-xrefs-function 'helm-xref-show-xrefs)))))
+;; helm-xref package
+(athenacle||add-package
+ :package helm-xref
+ :use-package helm-xref
+ :use-package-config
+   (setq xref-show-xrefs-function 'helm-xref-show-xrefs))
+
 
 ;;; nameless-mode package
-(add-to-list 'athenacle|setup-package-lists
-             '(nameless . (lambda ()
-                            (add-to-list 'nameless-global-aliases '("ATH" . "athenacle"))
-                            (add-hook 'emacs-lisp-mode-hook #'nameless-mode)
-                            (add-hook 'nameless-mode-hook
-                                      (lambda()
-                                        (let ((current-buffer-name (buffer-file-name)))
-                                          (when (and current-buffer-name (string-suffix-p ".el" current-buffer-name))
-                                            (setq-local 'nameless-current-name (file-name-base current-buffer-name)))))))))
+(athenacle||add-package
+ :package nameless
+ (add-to-list 'nameless-global-aliases '("ATH" . "athenacle"))
+ (add-hook 'emacs-lisp-mode-hook #'nameless-mode)
+ (add-hook 'nameless-mode-hook
+           (lambda()
+             (let ((current-buffer-name (buffer-file-name)))
+               (when (and current-buffer-name (string-suffix-p ".el" current-buffer-name))
+                 (setq-local nameless-current-name (file-name-base current-buffer-name)))))))
 
 
 ;;; neotree package
 (defvar athenacle|buffer-root-directory nil "Global Buffer Root directory as nil, after press <f3>, this variable will be buffer-local.")
 
-(add-to-list 'athenacle|setup-package-lists
-             '(neotree . (lambda ()
-                           (global-set-key
-                            (kbd "<f3>")
-                            (lambda ()
-                              "Toggle neotree according to directory root."
-                              (interactive)
-                              (setq neo-theme (if (display-graphic-p) 'icons 'arrow))
-                              ;; `neo-global--window-exists-p' and `delete-window' are stolen from `neotree-hide' function.
-                              (if (neo-global--window-exists-p)
-                                  (delete-window neo-global--window)
-                                (progn
-                                  (if (not athenacle|buffer-root-directory)
-                                      (let ((tmp-dir (athenacle|lib-search-buffer-file-root)))
-                                        (if tmp-dir
-                                            (setq-local athenacle|buffer-root-directory tmp-dir)
-                                          (setq-local athenacle|buffer-root-directory default-directory))))
-                                  (neotree-dir athenacle|buffer-root-directory))))))))
+(athenacle||add-package
+ :package neotree
+ (global-set-key
+  (kbd "<f3>")
+  (lambda ()
+    "Toggle neotree according to directory root."
+    (interactive)
+    (setq neo-theme (if (display-graphic-p) 'icons 'arrow))
+    ;; `neo-global--window-exists-p' and `delete-window' are stolen from `neotree-hide' function.
+    (if (neo-global--window-exists-p)
+        (delete-window neo-global--window)
+      (progn
+        (if (not athenacle|buffer-root-directory)
+            (let ((tmp-dir (athenacle|lib-search-buffer-file-root)))
+              (if tmp-dir
+                  (setq-local athenacle|buffer-root-directory tmp-dir)
+                (setq-local athenacle|buffer-root-directory default-directory))))
+        (neotree-dir athenacle|buffer-root-directory))))))
+
+
+;;; evil package
+(athenacle||add-package
+ :package evil
+ (require 'evil-common)
+ (require 'evil-commands)
+ (defun athenacle|evil-ZQ ()
+   "evil-ZQ delete "
+   (interactive)
+   (evil-delete-buffer (current-buffer))
+   (when (athenacle|spacemacs-enabled)
+     (spacemacs/home-delete-other-windows)))
+ (define-key evil-normal-state-map "ZQ" 'athenacle|evil-ZQ)
+ (define-key evil-normal-state-map "ZZ"
+   (lambda ()
+     (interactive)
+     (when (buffer-modified-p)
+       (save-buffer)
+       (message "Buffer %s saved to disk." (buffer-file-name (current-buffer))))
+     (athenacle|evil-ZQ))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -131,64 +160,61 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;; chinese layer
-(add-to-list 'athenacle|setup-layer-lists
-             '(chinese . (lambda ()
-                           (spacemacs//set-monospaced-font
-                            "Source Code Pro for Powerline"
-                            "Noto Sans Mono CJK SC"
-                            15
-                            16))))
+(athenacle||add-package
+ :layer chinese
+ (spacemacs//set-monospaced-font
+  "Source Code Pro for Powerline"
+  "Noto Sans Mono CJK SC"
+  15
+  16))
 
 
 ;;; rcirc layer
-(add-to-list 'athenacle|setup-layer-lists
-             '(rcirc . (lambda ()
-                         (add-hook 'rcirc-mode-hook
-                                   (lambda ()
-                                     "This function read rcirc credentials in other file named private_things."
-                                     (require 'privacy_things)
-                                     (setq rcirc-server-alist athenacle|rcirc-server))))))
+(athenacle||add-package
+ :layer rcirc
+ :use-package rcirc
+ :use-package-config
+ (add-hook 'rcirc-mode-hook
+           (lambda ()
+             "This function read rcirc credentials in other file named private_things."
+             (require 'privacy_things)
+             (setq rcirc-server-alist athenacle|rcirc-server))))
 
 
 ;;; elfeed layer
-(add-to-list 'athenacle|setup-layer-lists
-             '(elfeed . (lambda ()
-                          (use-package elfeed
-                            :bind
-                            (:map elfeed-search-mode-map ("R" . elfeed-search-untag-all-unread))))))
-;; (require 'elfeed-search)
-;; (define-key elfeed-search-mode-map (kbd "R")
-;;   (lambda ()
-;;     "Mark all elfeed threads as read."
-;;     (interactive)
-;;     (mark-whole-buffer)
-;;     (elfeed-search-untag-all-unread))))))
+(athenacle||add-package
+ :layer elfeed
+ :use-package elfeed-search
+ :use-package-config
+ (define-key elfeed-search-mode-map (kbd "R")
+   (lambda ()
+     "Mark all elfeed threads as read."
+     (interactive)
+     (mark-whole-buffer)
+     (elfeed-search-untag-all-unread))))
 
 
 ;;; git layer
-(add-to-list 'athenacle|setup-layer-lists
-             '(git . (lambda ()
-                       (spacemacs/declare-prefix "gz" "others")
-                       (spacemacs/set-leader-keys
-                         "gzp" 'magit-pull-popup
-                         "gzf" 'magit-fetch-popup
-                         "gzP" 'magit-push-popup))))
+(athenacle||add-package
+ :layer git
+ (spacemacs/declare-prefix "gz" "others")
+ (spacemacs/set-leader-keys
+   "gzp" 'magit-pull-popup
+   "gzf" 'magit-fetch-popup
+   "gzP" 'magit-push-popup))
+
+
+;;; react layer
+(athenacle||add-package
+ :layer react
+ :use-package init-lsp
+ :use-package-config
+   (athenacle|start-lsp react-mode :start lsp-javascript-typescript-enable))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; setup layers end
 
-;;; combine them in one
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(defun athenacle|setup-packages()
-  "Setup PACKAGES."
-  (athenacle|add-packages-to-load-path)
-  (dolist (pf athenacle|setup-package-lists)
-    (athenacle|setup-if-package-used (car pf) (cdr pf)))
-  (dolist (pf athenacle|setup-layer-lists)
-    (athenacle|setup-if-layer-used (car pf) (cdr pf))))
-
 (provide 'init-packages)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; init-packages.el ends here
