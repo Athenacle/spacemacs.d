@@ -9,11 +9,11 @@
     - [[#lsp-keys][LSP Keys]]
 - [[#library-references][Library References]]
   - [[#lisp-function-list][Lisp Function List]]
-    - [[#athenacleparse-args][=athenacle|parse-args=]]
-    - [[#athenaclelib-build-lambda-from-sexps][=athenacle|lib-build-lambda-from-sexps=]]
+    - [[#athenacleparse-args][athenacle|parse-args]]
+    - [[#athenaclelib-build-lambda-from-sexps][athenacle|lib-build-lambda-from-sexps]]
   - [[#lisp-macro-list][Lisp Macro List]]
-    - [[#athenaclelib-call-if][=athenacle||lib-call-if=]]
-    - [[#athenaclelib-macro][=athenacle||lib-macro=]]
+    - [[#athenaclelib-call-if][athenacle||lib-call-if]]
+    - [[#athenaclelib-macro][athenacle||lib-macro]]
   - [[#lsp][LSP]]
     - [[#athenaclestart-lsp][athenacle|start-lsp]]
     - [[#add-new-lsp-backend][Add New LSP Backend]]
@@ -29,6 +29,7 @@
 
 * Layers
   - [[layers/athenacle-markdown][athenacle-markdown]] A fork of official [[https://github.com/syl20bnr/spacemacs/blob/master/layers/+lang/markdown/README.org][markdown]] layer. Added some other configurations.
+  -[[layers/ebuild][ ebuild]] [[https://wiki.gentoo.org/wiki/Ebuild][ebuild]] file mode.
 
 * Configuration
 ** Keys
@@ -49,10 +50,9 @@
     | ~SPC~ =mns= | LSP Find Workspace Symbols | Go/Javascript/Python/Java/C/C++/ObjC | LSP   |
     | ~SPC~ =mnc= | Clear Buffer Delimiters    | Go/Javascript/Python/Java/C/C++/ObjC | LSP   |
 
-
 * Library References
 ** Lisp Function List
-*** =athenacle|parse-args=
+*** athenacle|parse-args
     - Extract =keys= keyword and =body= arguments from =args=, put all key arguments into *hashtable*, put =body= expressions into list. Returns (cons =hashtable= =body)
     - ~(defun athenacle|parse-args (keys args))~
       - keys =list=
@@ -69,7 +69,7 @@
       ;; => (car (athenacle|parse-args ...) will get `hashtable', aka keyword argument,
       ;; => (cdr (athenacle|parse-args ...) will get `list', which can be processed by `eval'
     #+END_SRC
-*** =athenacle|lib-build-lambda-from-sexps=
+*** athenacle|lib-build-lambda-from-sexps
     - Build anonymous lambda function which parameters are =args= and body are list of sexp =list-of-sexp=
     - ~(defun athenacle|lib-build-lambda-from-sexps (args list-of-sexp))~
       - args =list=
@@ -89,7 +89,7 @@
       (funcall msg "a" "b" "c")
     #+END_SRC
 ** Lisp Macro List
-*** =athenacle||lib-call-if=
+*** athenacle||lib-call-if
     - Call =func= when =pred= is not nil, with arguments =object= and =others=
     - ~(defmacro athenacle||lib-call-if pred func &optional object others)~
       - pred =function=
@@ -105,24 +105,24 @@
              (apply (quote ,func) (cons ,object ,others))))
 
         (athenacle|start-lsp go-mode :start go-go-go-go-enable)
-      ;; sample
-      (athenacle||lib-call-if (lambda () t) message "sample %s message" '("usage"))
+        ;; sample
+        (athenacle||lib-call-if (lambda () t) message "sample %s message" '("usage"))
 
-      ;; expand
-      (macro-expand '(athenacle||lib-call-if (lambda () t) message "sample %s message" '("usage")))
-      ;; ==>
-      ;; (if
-      ;;     (funcall
-      ;;      (lambda nil t))
-      ;;     (progn
-      ;;       (apply 'message
-      ;;               (cons "sample %s message"
-      ;;                     '("usage")))))
+        ;; expand
+        (macro-expand '(athenacle||lib-call-if (lambda () t) message "sample %s message" '("usage")))
+        ;; ==>
+        ;; (if
+        ;;     (funcall
+        ;;      (lambda nil t))
+        ;;     (progn
+        ;;       (apply 'message
+        ;;               (cons "sample %s message"
+        ;;                     '("usage")))))
       #+END_SRC
     - Related Macros
       - =athenacle||lib-call-if-debug-on-error=
       - =athenacle||lib-message-if-debug-on-error=
-*** =athenacle||lib-macro=
+*** athenacle||lib-macro
     - Build *MACRO* called =name=, it has a list of =keys= keyword parameters, and it has its own body.
     - ~(cl-defmacro athenacle||lib-macro (name keys &rest rest))~
       - name =symbol=
@@ -132,8 +132,8 @@
     - Sample
       #+BEGIN_SRC emacs-lisp
         (athenacle||lib-macro test-macro (a b c)
-                    (message "in test-macro" )
-                    (funcall body))   ;; note this `body' object
+                        (message "in test-macro" )
+                        (funcall body))   ;; note this `body' object
         ;;  ==>> test-macro
 
         ;; this expression will define a macro `test-macro' which just like
