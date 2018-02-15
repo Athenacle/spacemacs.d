@@ -9,8 +9,11 @@
     - [[#lsp-keys][LSP Keys]]
 - [[#library-references][Library References]]
   - [[#lisp-function-list][Lisp Function List]]
+    - [[#athenacleparse-args][=athenacle|parse-args=]]
+    - [[#athenaclelib-build-lambda-from-sexps][=athenacle|lib-build-lambda-from-sexps=]]
   - [[#lisp-macro-list][Lisp Macro List]]
     - [[#athenaclelib-call-if][=athenacle||lib-call-if=]]
+    - [[#athenaclelib-macro][=athenacle||lib-macro=]]
   - [[#lsp][LSP]]
     - [[#athenaclestart-lsp][athenacle|start-lsp]]
     - [[#add-new-lsp-backend][Add New LSP Backend]]
@@ -48,8 +51,43 @@
 
 
 * Library References
-
 ** Lisp Function List
+*** =athenacle|parse-args=
+    - Extract =keys= keyword and =body= arguments from =args=, put all key arguments into *hashtable*, put =body= expressions into list. Returns (cons =hashtable= =body)
+    - ~(defun athenacle|parse-args (keys args))~
+      - keys =list=
+      - args =list=
+    - Sample
+    #+BEGIN_SRC emacs-lisp
+      (athenacle|parse-args (a b c d) (:a "a" :b "b" :c "c" (sexp-1) (sexp-2) (sexp-3)))
+      ;;                ==>>
+      ;; (#<hash-table equal 3/5 0x2d275e1>
+      ;;         (sexp-1)
+      ;;         (sexp-2)
+      ;;         (sexp-3))
+      ;; in hashtable, a -> "a" b -> "b" c -> "c". d doesnot exist in hashtable, so, when we try to (get-hash "d" hashtable) -> nil
+      ;; => (car (athenacle|parse-args ...) will get `hashtable', aka keyword argument,
+      ;; => (cdr (athenacle|parse-args ...) will get `list', which can be processed by `eval'
+    #+END_SRC
+*** =athenacle|lib-build-lambda-from-sexps=
+    - Build anonymous lambda function which parameters are =args= and body are list of sexp =list-of-sexp=
+    - ~(defun athenacle|lib-build-lambda-from-sexps (args list-of-sexp))~
+      - args =list=
+      - list-of-sexp =list=
+    - Sample
+    #+BEGIN_SRC emacs-lisp
+      (setq msg
+            (athenacle|lib-build-lambda-from-sexps '(a b c) '((message "%s" a) (message "%s" b) (message "%s" c))))
+      ;; msg ==>>
+      ;; (lambda
+      ;;   (a b c)
+      ;;   nil
+      ;;   (message "%s" a)
+      ;;   (message "%s" b)
+      ;;   (message "%s" c))
+
+      (funcall msg "a" "b" "c")
+    #+END_SRC
 ** Lisp Macro List
 *** =athenacle||lib-call-if=
     - Call =func= when =pred= is not nil, with arguments =object= and =others=
@@ -67,7 +105,6 @@
              (apply (quote ,func) (cons ,object ,others))))
 
         (athenacle|start-lsp go-mode :start go-go-go-go-enable)
-      #+END_SRC
       ;; sample
       (athenacle||lib-call-if (lambda () t) message "sample %s message" '("usage"))
 
@@ -85,6 +122,47 @@
     - Related Macros
       - =athenacle||lib-call-if-debug-on-error=
       - =athenacle||lib-message-if-debug-on-error=
+*** =athenacle||lib-macro=
+    - Build *MACRO* called =name=, it has a list of =keys= keyword parameters, and it has its own body.
+    - ~(cl-defmacro athenacle||lib-macro (name keys &rest rest))~
+      - name =symbol=
+      - keys =list=
+      - rest =list=
+    - =body= parameters: the body part of /name/ object
+    - Sample
+      #+BEGIN_SRC emacs-lisp
+        (athenacle||lib-macro test-macro (a b c)
+                    (message "in test-macro" )
+                    (funcall body))   ;; note this `body' object
+        ;;  ==>> test-macro
+
+        ;; this expression will define a macro `test-macro' which just like
+        (lambda
+          (body a b c)
+          (message "in-test-macro")
+          (funcall body))
+
+        (test-macro
+         :a "I am a"
+         :b 10
+         (message "a: %s" a)
+         (message "b: %d" b)
+         (message "c: %s" c))
+        ;;  ==>>
+        ;; in test-macro
+        ;; a: I am a
+        ;; b: 10
+        ;; c: nil
+
+        ;; this expression will call the lambda above with argument: a -> "I am a" b -> 10 c -> nil
+        ;; body ->
+        ;; (lambda()
+        ;;     (message "a: %s" a)
+        ;;     (message "b: %d" b)
+        ;;     (message "c: %s" c))
+      #+END_SRC
+      - Related Macros
+        - =athenacle||add-package=
 ** LSP
 *** athenacle|start-lsp
     =athenacle|start-lsp= is a /macro/ defined in [[lisp/init-lsp.el][init-lsp.el]]
