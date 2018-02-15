@@ -57,9 +57,10 @@
                       auto-completion-private-snippets-directory nil)
      emacs-lisp
      git
-     lua
      rcirc
+     react
      gtags
+     ebuild
      (chinese :variables
               chinese-enable-fcitx t)
      (elfeed :variables
@@ -73,7 +74,6 @@
                      ispell-dictionary "american"
                      spell-checking-enable-by-default nil)
      syntax-checking
-     emoji
      shell-scripts
      python
      java
@@ -102,8 +102,7 @@
                             lsp-ui
                             helm-xref
                             cquery
-                            lsp-java
-                            )
+                            lsp-java)
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
    ;; A list of packages that will not be installed and loaded.
@@ -195,7 +194,7 @@
    ;; (default 'vim)
    dotspacemacs-editing-style 'vim
    ;; If non nil output loading progress in `*Messages*' buffer. (default nil)
-   dotspacemacs-verbose-loading t
+   dotspacemacs-verbose-loading nil
    ;; Specify the startup banner. Default value is `official', it displays
    ;; the official spacemacs logo. An integer value is the index of text
    ;; banner, `random' chooses a random text banner in `core/banners'
@@ -226,7 +225,7 @@
    dotspacemacs-colorize-cursor-according-to-state t
    ;; Default font, or prioritized list of fonts. `powerline-scale' allows to
    ;; quickly tweak the mode-line size to make separators look not too crappy.
-   dotspacemacs-default-font '("Source Code Pro for Powerline"
+   dotspacemacs-default-font '("Hack"
                      :size 15
                      :weight normal
                      :width normal
@@ -311,7 +310,7 @@
    ;; If non nil a progress bar is displayed when spacemacs is loading. This
    ;; may increase the boot time on some systems and emacs builds, set it to
    ;; nil to boost the loading time. (default t)
-   dotspacemacs-loading-progress-bar t
+   dotspacemacs-loading-progress-bar nil
    ;; If non nil the frame is fullscreen when Emacs starts up. (default nil)
    ;; (Emacs 24.4+ only)
    dotspacemacs-fullscreen-at-startup nil
@@ -384,8 +383,7 @@
    ;; `trailing' to delete only the whitespace at end of lines, `changed'to
    ;; delete only whitespace for changed lines or `nil' to disable cleanup.
    ;; (default nil)
-   dotspacemacs-whitespace-cleanup t
-   ))
+   dotspacemacs-whitespace-cleanup t))
 
 (defun dotspacemacs/user-init ()
   "Initialization function for user code.
@@ -410,6 +408,4 @@
   (require 'init-packages)
   (require 'init-others)
   (require 'init-lsp)
-  (athenacle|setup-packages)
   (athenacle|setup-others))
-
