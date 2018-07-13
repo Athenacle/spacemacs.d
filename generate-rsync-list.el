@@ -9,7 +9,7 @@
   (message "%s\n%s" "Argument error."
            "Usage: emacs -Q --script generate-rsync-list.el <path to .emacs.d> <dest file>")
   (kill-emacs 255))
-
+
 (defvar athenacle|emacs-d-path (elt argv 0))
 (defvar athenacle|dest-file-path (elt argv 1))
 
@@ -23,6 +23,7 @@
 (message "layer directroy list file path: %s" athenacle|dest-file-path) ;; output dest file path
 
 ;;; get layer list from spacemacs configuration file.
+
 (defvar dotspacemacs-configuration-layers)
 (defconst dotspacemacs-configuration-file-home (expand-file-name "~/.spacemacs"))
 (defconst dotspacemacs-configuration-file-dotspacmacs (expand-file-name "~/.spacemacs.d/init.el"))
@@ -34,10 +35,18 @@
 
 (load-file dotspacemacs-configuration-file)
 (dotspacemacs/layers)
+
+(dolist (a '(ivy groovy treemacs
+                 spacemacs-bootstrap spacemacs spacemacs-base
+                 spacemacs-docker spacemacs-editing spacemacs-editing
+                 spacemacs-visual spacemacs-navigation spacemacs-org
+                 spacemacs-editing-visual spacemacs-evil spacemacs-layouts
+                 spacemacs-language spacemacs-purpose spacemacs-modeline
+                 spacemacs-misc spacemacs-completion neotree))
+  (push a dotspacemacs-configuration-layers))
 (defvar dotspacemacs-layers (seq-map (lambda(n) (if (listp n) (car n) n)) dotspacemacs-configuration-layers))
 
 ;;; get all layer categories from spacemacs
-
 
 (defvar spacemacs-layer-cates
   (seq-filter
@@ -83,36 +92,12 @@
 
 ;;; generate file list output
 (defvar athenacle|layers-list-output "")
-(defvar athenacle|additional-list
-  '(
-   "layers/+distributions/spacemacs-bootstrap"
-   "layers/+distributions/spacemacs"
-   "layers/+distributions/spacemacs-base"
-   "layers/+distributions/spacemacs-docker"
-   "layers/+spacemacs/spacemacs-editing"
-   "layers/+spacemacs/spacemacs-editing"
-   "layers/+spacemacs/spacemacs-visual"
-   "layers/+spacemacs/spacemacs-navigation"
-   "layers/+spacemacs/spacemacs-org"
-   "layers/+spacemacs/spacemacs-editing-visual"
-   "layers/+spacemacs/spacemacs-evil"
-   "layers/+spacemacs/spacemacs-layouts"
-   "layers/+spacemacs/spacemacs-language"
-   "layers/+spacemacs/spacemacs-purpose"
-   "layers/+spacemacs/spacemacs-modeline"
-   "layers/+spacemacs/spacemacs-misc"
-   "layers/+spacemacs/spacemacs-completion"
-   "layers/+filetree/neotree"
-    ))
 
 (seq-do
  (lambda (n)
    (let ((cate (car n)))
      (seq-do (lambda (l) (setq athenacle|layers-list-output (concat athenacle|layers-list-output (format "layers/%s/%s\n" cate l)))) (car(cdr n)))))
  athenacle|enabled-layers-cates)
-
-(dolist (add athenacle|additional-list)
-  (setq athenacle|layers-list-output (concat athenacle|layers-list-output (format "%s\n" add))))
 
 ;;; write file to dest
 (write-region athenacle|layers-list-output nil athenacle|dest-file-path 'append)
