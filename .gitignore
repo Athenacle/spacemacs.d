@@ -4,4 +4,6 @@ lisp/privacy_things.el
 custom.el
 packages/
 .spacemacs.env
+spacemacs.env
+
 
