@@ -39,6 +39,7 @@
 (require 'lsp-mode)
 (require 'company)
 (require 'lsp-ui)
+(require 'lsp-ui-flycheck)
 (require 'company-lsp)
 
 (add-hook 'lsp-mode-hook 'lsp-ui-mode)
@@ -51,7 +52,7 @@
 (defconst athenacle|js-ts-server "/home/wangxiao/gits/javascript-typescript-langserver/lib/language-server-stdio.js")
 (defconst athenacle|go-server "/home/wangxiao/.go/bin/go-langserver" )
 (defconst athenacle|node-bin "node")
-(defconst athenacle|cquery-path "~/.local/bin/cquery")
+(defconst athenacle|ccls-path "~/.local/bin/ccls")
 (defconst athenacle|pyls-path "~/.local/bin/pyls")
 (defconst athenacle|jdt-path "~/gits/eclipse.jdt.ls/org.eclipse.jdt.ls.product/target/repository")
 
@@ -96,7 +97,7 @@ AFTER: function called after `START'
                          (,before)
                          ;;                         (athenacle|start-lsp-mode (quote,mode))
                          (with-eval-after-load 'lsp-mode
-                           (require 'lsp-flycheck))
+                           (require 'lsp-ui-flycheck))
                          (flycheck-mode t)
                          (when (athenacle|spacemacs-enabled)
                            (spacemacs|add-company-backends :modes ,mode :backends company-lsp)
@@ -112,6 +113,18 @@ AFTER: function called after `START'
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;; functions end
+
+(use-package company-lsp
+  :defer t
+  :init
+  (setq company-quickhelp-delay 0)
+  ;; Language servers have better idea filtering and sorting,
+  ;; don't filter results on the client side.
+  (setq company-transformers nil
+        company-lsp-async t
+        company-lsp-cache-candidates nil)
+  (spacemacs|add-company-backends :backends company-lsp :modes c-mode-common))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;; clients
 
@@ -164,21 +177,24 @@ AFTER: function called after `START'
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; cquery
 
-(require 'cquery)
-(setq cquery-executable athenacle|cquery-path)
+(use-package ccls
+  :defer t
+  :init
+  ((setq ccls-executable athenacle|ccls-path)
+   (setq ccls-extra-init-params '(:enableComments 0 :cacheFormat "msgpack"))))
 
-(defun athenacle|lsp-cquery-toggle-cquery-code-length()
+(defun athenacle|lsp-ccls-toggle-cquery-code-length()
   "Toggle code length."
   (interactive)
-  (if (get 'cquery-code-lens-mode 'codelens-state)
+  (if (get 'ccls-code-lens-mode 'codelens-state)
       (progn
-        (cquery-clear-code-lens)
-        (put 'cquery-code-lens-mode 'codelens-state nil))
+        (ccls-clear-code-lens)
+        (put 'ccls-code-lens-mode 'codelens-state nil))
     (progn
-      (cquery-request-code-lens)
-      (put 'cquery-code-lens-mode 'codelens-state t))))
+      (ccls-request-code-lens)
+      (put 'ccls-code-lens-mode 'codelens-state t))))
 
-(defun athenacle/lsp-cquery-clear-buffer-delimiters()
+(defun athenacle/lsp-ccls-clear-buffer-delimiters()
   "Clear Delitmiters."
   (interactive)
   (rainbow-delimiters-mode-disable)
@@ -186,16 +202,16 @@ AFTER: function called after `START'
 
 (defun athenacle|cquery-post-init (mode)
   "Post-init funtion for MODE."
-  (put 'cquery-code-lens-mode 'code-length-state nil)
+  (put 'ccls-code-lens-mode 'code-length-state nil)
   (when (athenacle|spacemacs-enabled)
     (progn
       (spacemacs|diminish cquery-code-lens-mode " ☪ " "LEN")
       (spacemacs/set-leader-keys-for-major-mode mode
-        "nl" 'athenacle-lsp/toggle-cquery-code-length))))
+        "nl" 'athenacle|lsp-ccls-toggle-cquery-code-length))))
 
-(athenacle|start-lsp c-mode :start lsp-cquery-enable :after (lambda () (athenacle|cquery-post-init 'c-mode)))
-(athenacle|start-lsp c++-mode :start lsp-cquery-enable :after (lambda () (athenacle|cquery-post-init 'c++-mode)))
-(athenacle|start-lsp objc-mode :start lsp-cquery-enable :after (lambda () (athenacle|cquery-post-init 'objc-mode)))
+(athenacle|start-lsp c-mode :start lsp-ccls-enable :after (lambda () (athenacle|cquery-post-init 'c-mode)))
+(athenacle|start-lsp c++-mode :start lsp-ccls-enable :after (lambda () (athenacle|cquery-post-init 'c++-mode)))
+(athenacle|start-lsp objc-mode :start lsp-ccls-enable :after (lambda () (athenacle|cquery-post-init 'objc-mode)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; python
