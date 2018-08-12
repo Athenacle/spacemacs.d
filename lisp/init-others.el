@@ -154,6 +154,8 @@ Suitable for inclusion in `c-offsets-alist'."
   "Setup other packages."
   (athenacle|setup-c-modes-hooks))
 
+(require 'mediawiki)
+
 (provide 'init-others)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; init-others.el ends here

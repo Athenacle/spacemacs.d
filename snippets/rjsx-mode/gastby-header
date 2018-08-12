@@ -1,0 +1,14 @@
+-*- mode: snippet -*-
+# name: general-mode-header-for-athenacle.xyz
+# key: gatsby-header
+# --
+/*
+* https://athenacle.xyz site source file.
+*
+* Powered by Gatsby
+*
+* Copyright (c) 2018 Athenacle (zjjhwxc@gmail.com)
+*
+* This file is released under MIT license. Please refer to LICENSE file for more details.
+*
+*/

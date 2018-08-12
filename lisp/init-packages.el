@@ -50,7 +50,6 @@
 (defalias 'athenacle|package-used 'configuration-layer/package-used-p)
 (defalias 'athenacle|layer-used 'configuration-layer/layer-used-p)
 
-(defun athenacle|add-packages-to-load-path ()
   "Add directories exist in ~/.spacemacs.d/packages to `load-path'."
   (let ((package-directory (expand-file-name "~/.spacemacs.d/packages")))
     (seq-do
@@ -72,6 +71,7 @@
                `(when use-package
                  (use-package ,use-package
                    :defer t
+                   :use-package-verbose debug-on-error
                    :config
                    (progn ,use-package-config)))
                (if (funcall pred pkg)
@@ -88,6 +88,31 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; setup packages
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(athenacle||add-package
+ :package company
+ :use-package company-childframe
+ :use-package-config
+ (progn
+   (company-childframe-mode t)))
+
+;; pyim
+(athenacle||add-package
+ :package pyim
+ (use-package pyim
+   :ensure nil
+   :demand t
+   :config
+   (use-package pyim-basedict
+     :ensure nil
+     :config (pyim-basedict-enable))
+   (setq default-input-method "pyim")
+   (setq pyim-default-scheme 'quanpin)
+   (pyim-isearch-mode 1)
+   (setq pyim-page-tooltip 'posframe)
+   (setq pyim-page-length 9)
+   (add-hook 'emacs-startup-hook
+             #'(lambda () (pyim-restart-1 t)))))
+
 
 ;; helm-xref package
 (athenacle||add-package
@@ -153,6 +178,27 @@
      (athenacle|evil-ZQ))))
 
 
+;;; rjsx-mode
+(athenacle||add-package
+ :package rjsx-mode
+ :use-package rjsx-mode
+ :use-package-config
+ (when (athenacle|package-used 'company)
+   (setq company-backends-rjsx-mode '())
+   (add-to-list 'company-backends-rjsx-mode 'company-lsp))
+ (add-to-list 'auto-mode-alist '("\\.jsx\\'" . rjsx-mode))
+ (add-to-list 'auto-mode-alist '("\\.js\\'" . rjsx-mode))
+ (athenacle|start-lsp rjsx-mode :start lsp-javascript-typescript-enable))
+
+
+;; (use-package npm-mode
+;;   :defer t
+;;   :config
+;;   (when (athenacle|spacemacs-enabled)
+;;     (spacemacs/declare-prefix-for-mode rjsx-mode "mp" "npm tools")
+;;     (spacemacs/set-leader-keys-for-major-mode rjsx-mode
+;;       "pr" 'npm-mode-npm-run
+;;       "pl" 'npm-mode-visit-project-file)))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; setup packages end
 
@@ -166,7 +212,7 @@
   "Source Code Pro for Powerline"
   "Noto Sans Mono CJK SC"
   15
-  16))
+  25))
 
 
 ;;; rcirc layer
@@ -207,9 +253,7 @@
 ;;; react layer
 (athenacle||add-package
  :layer react
- :use-package init-lsp
- :use-package-config
-   (athenacle|start-lsp react-mode :start lsp-javascript-typescript-enable))
+ (athenacle|start-lsp react-mode :start lsp-javascript-typescript-enable))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

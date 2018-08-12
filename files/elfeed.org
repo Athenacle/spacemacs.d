@@ -1,5 +1,9 @@
 * Blogs                                                              :elfeed:
 ** Development                                                 :dev:
+*** Web
+****  http://taobaofed.org/atom.xml
+****  http://efe.baidu.com/atom.xml
+****  http://www.alloyteam.com/feed/
 *** Emacs                                                    :emacs:
 **** http://planet.emacsen.org/atom.xml
 *** Gentoo  :linux:
@@ -7,14 +11,6 @@
 **** https://security.gentoo.org/glsa/feed.rss
 *** Linux                                                         :linux:
 **** https://linux.cn/rss.xml
-**** http://feeds.feedburner.com/linuxjournalcom
-**** https://www.linux.com/feeds/blogs/community/rss
-**** https://www.linux.com/feeds/news/desktop/rss
-**** https://www.linux.com/feeds/news/rss
 *** Others
-**** https://maskray.me/blog/atom.xml
 **** https://coolshell.cn/feed
 ** Lifestyle  :others:
-*** Science
-**** http://songshuhui.net/feed
-**** http://www.solidot.org/index.rss

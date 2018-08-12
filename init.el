@@ -58,7 +58,6 @@
      emacs-lisp
      git
      rcirc
-     react
      gtags
      ebuild
      (chinese :variables
@@ -69,74 +68,71 @@
      (shell :variables
             shell-default-height 30
             shell-default-position 'bottom)
-     (spell-checking :variables
-                     ispell-program-name "aspell"
-                     ispell-dictionary "american"
-                     spell-checking-enable-by-default nil)
      syntax-checking
      shell-scripts
      python
-     java
-     javascript
-     scheme
-     (go :variables
-         go-use-gometalinter t
-         go-tab-width 4 )
      (c-c++ :variables
-            c-c++-enable-clang-support t
-            ;; c-c++-enable-cmake-ide-support t
+            c-c++-enable-clang-support nil
+            c-c++-enable-cmake-ide-support t
             c-c++-enable-clang-format-on-save t
             c-c++-enable-c++11 t
             c-c++-default-mode-for-headers 'c++-mode)
      (athenacle-markdown :variables
-                   athenacle-markdown/preview-browser "google-chrome-stable"))
+                         athenacle-markdown/preview-browser "google-chrome-stable"))
    ;; List of additional packages that will be installed without being
    ;; wrapped in a layer. If you need some configuration for these
    ;; packages, then consider creating a layer. You can also put the
    ;; configuration in `dotspacemacs/user-config'.
    dotspacemacs-additional-packages '(all-the-icons
-                            regex-tool
-
-                            lsp-mode
-                            company-lsp
-                            lsp-ui
-                            helm-xref
-                            cquery
-                            lsp-java)
+                                      regex-tool
+                                      cmake-mode
+                                      posframe
+                                      npm-mode
+                                      rjsx-mode
+                                      lsp-mode
+                                      yaml-mode
+                                      company-lsp
+                                      lsp-ui
+                                      helm-xref
+                                      ccls
+                                      lsp-java)
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
    ;; A list of packages that will not be installed and loaded.
    dotspacemacs-excluded-packages '(
-                          ;; for c cpp
-                          gdb-mi
-                          counsel-gtags
-                          google-c-style
-                          ;; for python
-                          anaconda-mode
-                          hy-mode
-                          ;; for java
-                          gradle-mode
-                          counsel-gtags
-                          maven-test-mode
-                          company-emacs-eclim
-                          meghanada ;; A Java IDE Server for your editor
-                          mvn
-                          ensime ;; ENhanced Scala Interaction Mode for Emacs
-                          flycheck-ensime
-                          groovy-mode
-                          groovy-imports
-                          ;; for javascript
-                          tern
-                          company-tern
-                          impatient-mode
-                          coffee-mode
-                          add-node-modules-path
-                          evil-matchit
-                          ;;
-                          google-translate
-                          lorem-ipsum ;; Insert dummy pseudo Latin text
-                          edit-server
-                          )
+                                    ;; for c cpp
+                                    gdb-mi
+                                    counsel-gtags
+                                    company-clang
+                                    google-c-style
+                                    ;; for python
+                                    pipenv
+                                    anaconda-mode
+                                    hy-mode
+                                    ;; for java
+                                    gradle-mode
+                                    counsel-gtags
+                                    maven-test-mode
+                                    company-emacs-eclim
+                                    meghanada ;; A Java IDE Server for your editor
+                                    mvn
+                                    ensime ;; ENhanced Scala Interaction Mode for Emacs
+                                    flycheck-ensime
+                                    groovy-mode
+                                    groovy-imports
+                                    ;; for javascript
+                                    tern
+                                    company-tern
+                                    impatient-mode
+                                    coffee-mode
+                                    add-node-modules-path
+                                    evil-matchit
+                                    ;;
+                                    google-translate
+                                    lorem-ipsum ;; Insert dummy pseudo Latin text
+                                    edit-server
+                                    yasnippet
+                                    )
    ;; Defines the behaviour of Spacemacs when installing packages.
    ;; Possible values are `used-only', `used-but-keep-unused' and `all'.
    ;; `used-only' installs only explicitly used packages and uninstall any
@@ -209,9 +205,9 @@
    ;; List sizes may be nil, in which case
    ;; `spacemacs-buffer-startup-lists-length' takes effect.
    dotspacemacs-startup-lists '((recents . 6)
-                      (agenda . 5)
-                      (todos  . 5)
-                      (projects . 5))
+                                (agenda . 5)
+                                (todos  . 5)
+                                (projects . 5))
    ;; True if the home buffer should respond to resize events.
    dotspacemacs-startup-buffer-responsive t
    ;; Default major mode of the scratch buffer (default `text-mode')
@@ -219,17 +215,17 @@
    ;; List of themes, the first of the list is loaded when spacemacs starts.
    ;; Press <SPC> T n to cycle to the next theme in the list (works great
    ;; with 2 themes variants, one dark and one light)
-   dotspacemacs-themes '(spacemacs-dark
-               spacemacs-light)
+   dotspacemacs-themes '(spacemacs-light
+                         spacemacs-dark)
    ;; If non nil the cursor color matches the state color in GUI Emacs.
    dotspacemacs-colorize-cursor-according-to-state t
    ;; Default font, or prioritized list of fonts. `powerline-scale' allows to
    ;; quickly tweak the mode-line size to make separators look not too crappy.
    dotspacemacs-default-font '("Hack"
-                     :size 15
-                     :weight normal
-                     :width normal
-                     :powerline-scale 0.8)
+                               :size 15
+                               :weight normal
+                               :width normal
+                               :powerline-scale 0.8)
    ;; The leader key
    dotspacemacs-leader-key "SPC"
    ;; The key used for Emacs commands (M-x) (after pressing on the leader key).
@@ -392,6 +388,10 @@
   This function is mostly useful for variables that need to be set
   before packages are loaded. If you are unsure, you should try in setting them in
   `dotspacemacs/user-config' first."
+  (setq configuration-layer-elpa-archives
+        '(("melpa-cn" . "http://elpa.emacs-china.org/melpa/")
+          ("org-cn"   . "http://elpa.emacs-china.org/org/")
+          ("gnu-cn"   . "http://elpa.emacs-china.org/gnu/")))
   (setq custom-file athenacle/custom-file)
   (load athenacle/custom-file))
 

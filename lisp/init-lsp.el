@@ -180,8 +180,9 @@ AFTER: function called after `START'
 (use-package ccls
   :defer t
   :init
-  ((setq ccls-executable athenacle|ccls-path)
-   (setq ccls-extra-init-params '(:enableComments 0 :cacheFormat "msgpack"))))
+  (progn
+    (setq ccls-executable athenacle|ccls-path)
+    (setq ccls-extra-init-params '(:enableComments 0 :cacheFormat "msgpack"))))
 
 (defun athenacle|lsp-ccls-toggle-cquery-code-length()
   "Toggle code length."
