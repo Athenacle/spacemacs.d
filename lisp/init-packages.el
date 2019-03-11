@@ -43,8 +43,9 @@
 ;;; utilities
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(require 'cl)
 (require 'libraries)
-(require 'init-lsp)
+;;(require 'init-lsp)
 
 
 (defalias 'athenacle|package-used 'configuration-layer/package-used-p)
@@ -57,7 +58,7 @@
        (let ((full-path (concat package-directory "/" dir)))
          (when (and (file-directory-p full-path) (not (string-prefix-p "." dir)))
            (add-to-list 'load-path full-path))))
-     (directory-files package-directory))))
+     (directory-files package-directory)))
 
 
 (ath-defmacro athenacle||add-package (layer package use-package use-package-config)
@@ -178,19 +179,6 @@
      (athenacle|evil-ZQ))))
 
 
-;;; rjsx-mode
-(athenacle||add-package
- :package rjsx-mode
- :use-package rjsx-mode
- :use-package-config
- (when (athenacle|package-used 'company)
-   (setq company-backends-rjsx-mode '())
-   (add-to-list 'company-backends-rjsx-mode 'company-lsp))
- (add-to-list 'auto-mode-alist '("\\.jsx\\'" . rjsx-mode))
- (add-to-list 'auto-mode-alist '("\\.js\\'" . rjsx-mode))
- (athenacle|start-lsp rjsx-mode :start lsp-javascript-typescript-enable))
-
-
 ;; (use-package npm-mode
 ;;   :defer t
 ;;   :config
@@ -248,12 +236,6 @@
    "gzp" 'magit-pull-popup
    "gzf" 'magit-fetch-popup
    "gzP" 'magit-push-popup))
-
-
-;;; react layer
-(athenacle||add-package
- :layer react
- (athenacle|start-lsp react-mode :start lsp-javascript-typescript-enable))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

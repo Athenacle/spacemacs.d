@@ -41,6 +41,7 @@
 (require 'lsp-ui)
 (require 'lsp-ui-flycheck)
 (require 'company-lsp)
+(require 'lsp)
 
 (add-hook 'lsp-mode-hook 'lsp-ui-mode)
 (push 'company-lsp company-backends)
@@ -131,48 +132,58 @@ AFTER: function called after `START'
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; go
 
-(lsp-define-stdio-client
- lsp-go
- "go"
- (lsp-make-traverser #'(lambda (dir)
-                         (directory-files dir nil "main.go")))
- `(,athenacle|go-server, "-mode=stdio")
- :initialize
- (lambda (client)
-   (lsp-provide-marked-string-renderer client "go" (athenacle|make-renderer "go")))
- :ignore-regexps
- '("^langserver-go: reading on stdin, writing on stdout$"))
+(lsp-register-client
+ (make-lsp-client :new-connection (lsp-stdio-connection "lsp-go")
+                  :major-modes '(go-mode)
+                  :server-id 'athenacle|go-server))
+
+;; (lsp-define-stdio-client
+;;  lsp-go
+;;  "go"
+;;  (lsp-make-traverser #'(lambda (dir)
+;;                          (directory-files dir nil "main.go")))
+;;  `(,athenacle|go-server, "-mode=stdio")
+;;  :initialize
+;;  (lambda (client)
+;;    (lsp-provide-marked-string-renderer client "go" (athenacle|make-renderer "go")))
+;;  :ignore-regexps
+;;  '("^langserver-go: reading on stdin, writing on stdout$"))
 
 (athenacle|start-lsp go-mode)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; js-ts
 
-(lsp-define-stdio-client
- lsp-javascript-typescript
- "javascript"
- (lsp-make-traverser #'(lambda (dir)
-                         (directory-files
-                          dir
-                          nil
-                          "package.json")))
- `(,athenacle|node-bin, athenacle|js-ts-server)
- :initialize
- (lambda (client)
-   (lsp-provide-marked-string-renderer client "javascript" (athenacle|make-renderer "javascript")))
- :ignore-messages '("readFile .*? requested by TypeScript but content not available"))
+(lsp-register-client
+ (make-lsp-client :new-connection (lsp-stdio-connection "lsp-js-ts")
+                  :major-modes '(js2-mode)
+                  :server-id 'athenacle|js-ts-server))
+;; (lsp-define-stdio-client
+;;  lsp-javascript-typescript
+;;  "javascript"
+;;  (lsp-make-traverser #'(lambda (dir)
+;;                          (directory-files
+;;                           dir
+;;                           nil
+;;                           "package.json")))
+;;  `(,athenacle|node-bin, athenacle|js-ts-server)
+;;  :initialize
+;;  (lambda (client)
+;;    (lsp-provide-marked-string-renderer client "javascript" (athenacle|make-renderer "javascript")))
+;;  :ignore-messages '("readFile .*? requested by TypeScript but content not available"))
 
-(athenacle|start-lsp js2-mode :start lsp-javascript-typescript-enable)
+(athenacle|start-lsp js2-mode )
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; java
-(use-package lsp-java
-  :defer t
-  :config
-  (progn
-    (setq lsp-java-server-install-dir athenacle|jdt-path)))
+;; (use-package lsp-java
+;;   :defer t
+;;   :config
+;;   (progn
+;;     (setq lsp-java-server-install-dir athenacle|jdt-path)))
 
-(athenacle|start-lsp java-mode)
+;; (athenacle|start-lsp java-mode)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; cquery
@@ -210,19 +221,17 @@ AFTER: function called after `START'
       (spacemacs/set-leader-keys-for-major-mode mode
         "nl" 'athenacle|lsp-ccls-toggle-cquery-code-length))))
 
-(athenacle|start-lsp c-mode :start lsp-ccls-enable :after (lambda () (athenacle|cquery-post-init 'c-mode)))
-(athenacle|start-lsp c++-mode :start lsp-ccls-enable :after (lambda () (athenacle|cquery-post-init 'c++-mode)))
-(athenacle|start-lsp objc-mode :start lsp-ccls-enable :after (lambda () (athenacle|cquery-post-init 'objc-mode)))
+(athenacle|start-lsp c-mode :after (lambda () (athenacle|cquery-post-init 'c-mode)))
+(athenacle|start-lsp c++-mode :after (lambda () (athenacle|cquery-post-init 'c++-mode)))
+(athenacle|start-lsp objc-mode :after (lambda () (athenacle|cquery-post-init 'objc-mode)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; python
 
-(lsp-define-stdio-client
- lsp-python
- "python"
- (lsp-make-traverser #'(lambda (dir)
-                         (directory-files dir nil "\\(__init__\\|setup\\)\\.py")))
- `(,athenacle|pyls-path))
+(lsp-register-client
+ (make-lsp-client :new-connection (lsp-stdio-connection "lsp-python")
+                  :major-modes '(python-mode)
+                  :server-id 'athenacle|pyls-server))
 
 (athenacle|start-lsp python-mode)
 
